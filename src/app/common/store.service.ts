@@ -13,7 +13,7 @@ import {fromPromise} from 'rxjs/internal-compatibility';
 
 export class Store {
 
-    private subject = new BehaviorSubject<Course[]>([]);
+    private subject = new BehaviorSubject<Course[]>([]);//[] this is initial value
 
     courses$: Observable<Course[]> = this.subject.asObservable();
 
@@ -44,7 +44,7 @@ export class Store {
         return this.courses$
             .pipe(
                 map(courses => courses.find(course => course.id == courseId)),
-                filter(course => !!course)
+                filter(course => !!course)//filter undefined as store is empty while initialized
 
             );
     }
@@ -62,7 +62,8 @@ export class Store {
         const courses = this.subject.getValue();
 
         const courseIndex = courses.findIndex(course => course.id == courseId);
-
+        //no mutation as other components doesn't
+      // get to know the values has been updated
         const newCourses = courses.slice(0);
 
         newCourses[courseIndex] = {
@@ -72,7 +73,9 @@ export class Store {
 
         this.subject.next(newCourses);
 
-        return fromPromise(fetch(`/api/courses/${courseId}`, {
+
+        // change in backend
+      return fromPromise(fetch(`/api/courses/${courseId}`, {
             method: 'PUT',
             body: JSON.stringify(changes),
             headers: {
